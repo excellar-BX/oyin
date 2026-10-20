@@ -1,0 +1,579 @@
+<title>Oyinkansolaaaaaaa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;500;700&family=Caveat:wght@500;700&display=swap">
+<style>
+  /* Layout: phone-first story deck. One full-height screen at a time, progress segments on top, back/next bar at the bottom. */
+  :root {
+    --sun: #FFC83D;        /* her colour, main ground */
+    --butter: #FFF4C9;     /* soft yellow for inner screens */
+    --honey: #E8A317;      /* deeper yellow for edges and pasta */
+    --ink: #2E1F0B;        /* warm brown-black text */
+    --tomato: #D8432B;     /* sauce red, used sparingly */
+    --cream: #FFFCEF;      /* cards and plate */
+    --ink-soft: #6B5326;   /* secondary text */
+    --font-display: "Bagel Fat One", "Arial Rounded MT Bold", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-hand: "Caveat", "Segoe Print", cursive;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body {
+    background: var(--sun);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.5;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  svg.lucide { width: 1.2em; height: 1.2em; stroke-width: 2.2; flex: none; }
+
+  .app { position: relative; height: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+
+  /* progress segments */
+  .progress { display: flex; gap: 5px; padding: 12px 16px 0; }
+  .progress span { flex: 1; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 18%, transparent); overflow: hidden; }
+  .progress span i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .35s ease; }
+  .progress span.done i { width: 100%; }
+
+  .stage { position: relative; flex: 1; min-height: 0; }
+  .screen {
+    position: absolute; inset: 0;
+    overflow-y: auto;
+    padding: 24px 20px 24px;
+    display: flex; flex-direction: column; gap: 18px;
+    opacity: 0; transform: translateX(24px); pointer-events: none;
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .screen.active { opacity: 1; transform: none; pointer-events: auto; }
+  .screen.left { transform: translateX(-24px); }
+
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
+  h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.02; margin: 0; text-wrap: balance; }
+  h2 { font-size: clamp(30px, 9vw, 40px); }
+  p { margin: 0; }
+  .lead { font-size: 18px; color: var(--ink); max-width: 34ch; }
+  .muted { color: var(--ink-soft); }
+
+  .name { font-size: clamp(44px, 14vw, 66px); letter-spacing: -.01em; overflow-wrap: anywhere; }
+  .name .tail { display: inline-flex; color: var(--tomato); }
+  .name .tail b { font-weight: 400; display: inline-block; animation: hop 1.6s ease-in-out infinite; }
+
+  @keyframes hop { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-.14em); } }
+
+  /* bottom bar */
+  .bar {
+    display: flex; gap: 10px; align-items: center;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 52px; padding: 0 22px; border-radius: 999px; border: 2.5px solid var(--ink);
+    background: var(--ink); color: var(--sun); font-weight: 700; font-size: 17px;
+    transition: transform .12s ease, opacity .2s;
+    text-decoration: none;
+  }
+  .btn:active { transform: scale(.96); }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn.round { width: 52px; padding: 0; }
+  .btn[disabled] { opacity: .35; pointer-events: none; }
+  .bar .next { flex: 1; }
+
+  /* screen 0: gift */
+  .gift-screen { align-items: center; justify-content: center; text-align: center; }
+  .giftbox {
+    width: 180px; height: 180px; border: none; background: none; padding: 0; position: relative;
+    animation: wiggle 2.4s ease-in-out infinite;
+  }
+  .giftbox .box { position: absolute; left: 20px; right: 20px; bottom: 0; height: 110px; background: var(--cream); border: 3px solid var(--ink); border-radius: 10px; }
+  .giftbox .lid { position: absolute; left: 8px; right: 8px; top: 38px; height: 40px; background: var(--cream); border: 3px solid var(--ink); border-radius: 10px; transition: transform .6s cubic-bezier(.3,1.6,.5,1); z-index: 2; }
+  .giftbox .ribbon-v { position: absolute; left: 50%; width: 26px; margin-left: -13px; top: 38px; bottom: 0; background: var(--tomato); border-left: 3px solid var(--ink); border-right: 3px solid var(--ink); z-index: 3; transition: transform .6s cubic-bezier(.3,1.6,.5,1); }
+  .giftbox .bow { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); color: var(--tomato); z-index: 4; transition: transform .6s cubic-bezier(.3,1.6,.5,1); }
+  .giftbox .bow svg { width: 52px; height: 52px; stroke: var(--ink); fill: var(--tomato); stroke-width: 1.8; }
+  .giftbox.open { animation: none; }
+  .giftbox.open .lid, .giftbox.open .bow { transform: translate(-10px, -90px) rotate(-18deg); }
+  .giftbox.open .bow { transform: translate(-60%, -90px) rotate(-18deg); }
+  .giftbox.open .ribbon-v { transform: scaleY(.0); transform-origin: bottom; }
+  @keyframes wiggle { 0%, 70%, 100% { transform: rotate(0); } 75% { transform: rotate(-6deg); } 82% { transform: rotate(6deg); } 89% { transform: rotate(-3deg); } }
+
+  /* card */
+  .card { background: var(--cream); border: 2.5px solid var(--ink); border-radius: 22px; padding: 18px; }
+  .meaning { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .meaning div { background: var(--butter); border-radius: 14px; padding: 10px 6px; }
+  .meaning strong { display: block; font-family: var(--font-display); font-weight: 400; font-size: 22px; }
+  .meaning small { color: var(--ink-soft); font-size: 13px; }
+
+  /* argue */
+  .arena { position: relative; min-height: 220px; }
+  .arena .choices { display: flex; flex-direction: column; gap: 12px; }
+  .runaway { position: relative; transition: transform .18s ease; align-self: flex-start; }
+  .verdict { display: flex; gap: 12px; align-items: flex-start; }
+  .verdict svg.lucide { width: 28px; height: 28px; color: var(--tomato); }
+
+  /* spaghetti */
+  .plate-wrap { display: grid; place-items: center; position: relative; }
+  #plate { width: min(280px, 78vw); height: auto; aspect-ratio: 1; max-width: 100%; }
+  .fork { position: absolute; right: 8%; top: 4%; transition: transform .35s ease; color: var(--ink); }
+  .fork svg.lucide { width: 46px; height: 46px; }
+  .fork.spin { transform: rotate(320deg); }
+  .twirl-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .counter { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+  /* cravings */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 16px;
+    border: 2.5px solid var(--ink); border-radius: 999px; background: var(--cream); font-weight: 600;
+  }
+  .chip { text-align: left; padding-block: 8px; transition: transform .25s ease, background .2s; }
+  .chip.nope { animation: shake .35s ease; background: var(--tomato); color: var(--cream); }
+  .chip.yes { background: var(--ink); color: var(--sun); }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .scold { font-family: var(--font-hand); font-size: 28px; line-height: 1.1; min-height: 31px; color: var(--tomato); }
+  .knew { display: flex; flex-direction: column; gap: 8px; }
+  .knew .big { font-family: var(--font-hand); font-size: 28px; line-height: 1.15; }
+
+  /* timeline */
+  .timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .timeline li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; padding-bottom: 18px; position: relative; }
+  .timeline li::before { content: ""; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2.5px; background: var(--ink); opacity: .25; }
+  .timeline li:last-child::before { display: none; }
+  .timeline .dot { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: var(--sun); display: grid; place-items: center; }
+  .timeline .dot svg.lucide { width: 20px; height: 20px; }
+  .timeline .when { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+  .timeline p { min-width: 0; }
+
+  /* prayers */
+  .prayers { display: flex; flex-direction: column; gap: 10px; }
+  .prayer { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; background: var(--cream); border: 2.5px solid var(--ink); border-radius: 18px; padding: 14px; }
+  .prayer .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--sun); display: grid; place-items: center; }
+  .prayer .ic svg.lucide { width: 18px; height: 18px; }
+  .prayer p { min-width: 0; }
+  .amen {
+    grid-column: 2; justify-self: start; margin-top: 8px; display: inline-flex; gap: 6px; align-items: center;
+    min-height: 38px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--ink); background: transparent; font-weight: 700; font-size: 15px;
+  }
+  .amen.said { background: var(--ink); color: var(--sun); }
+  .amen-count { font-variant-numeric: tabular-nums; }
+
+  /* note */
+  .note {
+    background: var(--cream); border-radius: 6px; padding: 26px 22px 22px; position: relative;
+    box-shadow: 0 2px 0 var(--ink), 0 14px 30px -18px rgba(46, 31, 11, .6);
+    background-image: repeating-linear-gradient(var(--cream) 0 37px, color-mix(in srgb, var(--honey) 35%, var(--cream)) 37px 38px);
+    transform: rotate(-1.2deg);
+  }
+  .note p { font-family: var(--font-hand); font-size: 25px; line-height: 38px; }
+  .note .sign { text-align: right; margin-top: 10px; }
+  .tape { position: absolute; top: -12px; left: 50%; width: 96px; height: 26px; margin-left: -48px; background: color-mix(in srgb, var(--sun) 70%, transparent); transform: rotate(3deg); }
+
+  /* cake */
+  .cake-screen { align-items: center; text-align: center; }
+  .cake { position: relative; width: 220px; height: 210px; margin-top: 8px; }
+  .cake .tier { position: absolute; left: 50%; transform: translateX(-50%); border: 3px solid var(--ink); border-radius: 14px; }
+  .cake .t1 { bottom: 10px; width: 210px; height: 78px; background: var(--cream); }
+  .cake .t2 { bottom: 84px; width: 156px; height: 62px; background: var(--sun); }
+  .cake .drip { position: absolute; left: 0; right: 0; top: -3px; height: 20px; background: var(--tomato); border-radius: 12px 12px 10px 10px; border-bottom: 3px solid var(--ink); }
+  .cake .stand { position: absolute; bottom: 0; left: 50%; width: 240px; margin-left: -120px; height: 14px; background: var(--ink); border-radius: 8px; }
+  .candles { position: absolute; bottom: 143px; left: 50%; transform: translateX(-50%); display: flex; gap: 22px; }
+  .candle { width: 12px; height: 40px; background: repeating-linear-gradient(-45deg, var(--cream) 0 6px, var(--tomato) 6px 10px); border: 2.5px solid var(--ink); border-radius: 4px; position: relative; }
+  .flame { position: absolute; left: 50%; bottom: 100%; width: 14px; height: 22px; margin-left: -7px; margin-bottom: 3px; background: var(--honey); border: 2px solid var(--ink); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; transform-origin: bottom center; animation: flicker .5s ease-in-out infinite alternate; transition: opacity .3s, transform .3s; }
+  .flame::after { content: ""; position: absolute; left: 3px; right: 3px; bottom: 2px; height: 8px; border-radius: 50%; background: var(--cream); }
+  .blown .flame { opacity: 0; transform: scale(.2) translateY(6px); animation: none; }
+  @keyframes flicker { from { transform: rotate(-4deg) scaleY(1); } to { transform: rotate(4deg) scaleY(1.1); } }
+  .final { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .final[hidden] { display: none !important; }
+  .final h1 { font-size: clamp(36px, 11vw, 52px); }
+  .final h1 .tail { color: var(--tomato); }
+
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--ink); color: var(--sun); padding: 10px 18px; border-radius: 999px; font-weight: 700; opacity: 0; transition: .25s; z-index: 60; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+  }
+</style>
+
+<div class="app">
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <div class="stage" id="stage">
+
+    <!-- 0 gift -->
+    <section class="screen gift-screen active" data-gate="gift">
+      <p class="eyebrow">21 October · a small something</p>
+      <h2>For Oyinkansolaaaaaaa</h2>
+      <button class="giftbox" id="giftbox" aria-label="Open your gift">
+        <span class="bow"><i data-lucide="gift"></i></span>
+        <span class="lid"></span>
+        <span class="ribbon-v"></span>
+        <span class="box"></span>
+      </button>
+      <p class="muted" id="giftHint">Tap the box to open it</p>
+    </section>
+
+    <!-- 1 name -->
+    <section class="screen">
+      <p class="eyebrow">Today is about you</p>
+      <h1 class="name">Happy birthday Oyinkansol<span class="tail" id="tail"></span></h1>
+      <p class="lead">Yes, all the a's are on purpose. You get extra letters today.</p>
+      <div class="card">
+        <p class="eyebrow" style="margin-bottom:10px">Your name, in three parts</p>
+        <div class="meaning">
+          <div><strong>Oyin</strong><small>honey</small></div>
+          <div><strong>kan</strong><small>has touched</small></div>
+          <div><strong>ṣọlá</strong><small>wealth</small></div>
+        </div>
+        <p style="margin-top:12px">Honey has touched wealth. Your name literally starts with honey, so of course your colour is yellow.</p>
+      </div>
+    </section>
+
+    <!-- 2 argue -->
+    <section class="screen">
+      <p class="eyebrow">Before we continue</p>
+      <h2>Settle this once and for all</h2>
+      <p class="lead">We argue over the smallest things, even over text. So, honestly: who wins most of our arguments?</p>
+      <div class="arena" id="arena">
+        <div class="choices" id="choices">
+          <button class="btn" id="pickHer"><i data-lucide="crown"></i>Oyinkansolaaaaaaa</button>
+          <button class="btn ghost runaway" id="pickMe"><i data-lucide="hand"></i>Me</button>
+        </div>
+        <div class="card verdict" id="verdict" hidden>
+          <i data-lucide="gavel"></i>
+          <div>
+            <p><strong>Correct answer.</strong></p>
+            <p id="verdictText">It's your birthday, so you win every argument today. Tomorrow I'm back to proving you wrong.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 spaghetti -->
+    <section class="screen">
+      <p class="eyebrow">Birthday plate</p>
+      <h2>Your spaghetti is ready</h2>
+      <p class="lead">Tap the plate to twirl. Clear the plate.</p>
+      <div class="plate-wrap">
+        <canvas id="plate" width="280" height="280" aria-label="Plate of spaghetti, tap to eat"></canvas>
+        <span class="fork" id="fork"><i data-lucide="utensils"></i></span>
+      </div>
+      <div class="twirl-row">
+        <span class="counter" id="bites">0 of 6 forkfuls</span>
+        <button class="btn ghost" id="twirlBtn"><i data-lucide="rotate-cw"></i>Twirl</button>
+      </div>
+      <p class="card" id="cleanPlate" hidden>Clean plate. Imaginary spaghetti, zero calories, still counts.</p>
+    </section>
+
+    <!-- 4 craving -->
+    <section class="screen">
+      <p class="eyebrow">Real question</p>
+      <h2>What are you craving today?</h2>
+      <p class="lead">You're always craving one thing or the other. Be honest. I already know the answer.</p>
+      <div class="chips" id="chips">
+        <button class="chip"><i data-lucide="utensils"></i>Spaghetti, obviously</button>
+        <button class="chip"><i data-lucide="sandwich"></i>Shawarma</button>
+        <button class="chip"><i data-lucide="pizza"></i>Pizza</button>
+        <button class="chip"><i data-lucide="ice-cream-cone"></i>Ice cream</button>
+        <button class="chip"><i data-lucide="drumstick"></i>Small chops</button>
+        <button class="chip" data-right="1"><i data-lucide="sunrise"></i>Hot morning eba, roasted plantain and Chupa Chups</button>
+        <button class="chip"><i data-lucide="cake-slice"></i>Cake</button>
+      </div>
+      <p class="scold" id="scold" aria-live="polite"></p>
+      <div class="card knew" id="knew" hidden>
+        <p class="eyebrow">Finally</p>
+        <p class="big">Knew it. Hot eba in the morning, roasted plantain, and a Chupa Chups to finish.</p>
+        <p class="muted" id="knewTries"></p>
+      </div>
+    </section>
+
+    <!-- 5 since january -->
+    <section class="screen">
+      <p class="eyebrow">2026, so far</p>
+      <h2>Since January</h2>
+      <ol class="timeline">
+        <li><span class="dot"><i data-lucide="hand-metal"></i></span><div><p class="when">January</p><p>We met. Neither of us knew what we were signing up for.</p></div></li>
+        <li><span class="dot"><i data-lucide="message-circle"></i></span><div><p class="when">Every month after</p><p>Arguments over tiny things, mostly by text. I still say I won some of them.</p></div></li>
+        <li><span class="dot"><i data-lucide="door-open"></i></span><div><p class="when">Somewhere in there</p><p>You let me in as a friend. You don't do that for many people, and I noticed.</p></div></li>
+        <li><span class="dot"><i data-lucide="sun"></i></span><div><p class="when">21 October</p><p>You turn a year older. Still craving something, still arguing.</p></div></li>
+      </ol>
+    </section>
+
+    <!-- 6 prayers -->
+    <section class="screen">
+      <p class="eyebrow">Say amen to each one</p>
+      <h2>Prayers for your new age</h2>
+      <div class="prayers" id="prayers"></div>
+      <p class="muted"><span class="amen-count" id="amenCount">0 of 7</span> amens said</p>
+    </section>
+
+    <!-- 7 note -->
+    <section class="screen">
+      <p class="eyebrow">A short note</p>
+      <div class="note">
+        <span class="tape"></span>
+        <p>Oyinkansolaaaaaaa,</p>
+        <p>I know you don't let many people in, so thank you for letting me be one of them. We've only known each other since January and it already feels like longer, mostly because of how much we argue.</p>
+        <p>I'm glad you were born. Enjoy today, eat well, and get everything you're craving.</p>
+        <p class="sign">From damiiiiii</p>
+      </div>
+    </section>
+
+    <!-- 8 cake -->
+    <section class="screen cake-screen">
+      <p class="eyebrow">Last thing</p>
+      <h2 id="cakeTitle">Make a wish</h2>
+      <p class="muted" id="cakeHint">Close your eyes, wish, then tap the cake to blow the candles.</p>
+      <button class="cake" id="cake" aria-label="Blow out the candles" style="border:none;background:none;padding:0">
+        <span class="candles"><span class="candle"><span class="flame"></span></span><span class="candle"><span class="flame"></span></span><span class="candle"><span class="flame"></span></span></span>
+        <span class="tier t2"><span class="drip"></span></span>
+        <span class="tier t1"><span class="drip" style="background:var(--sun)"></span></span>
+        <span class="stand"></span>
+      </button>
+      <div class="final" id="final" hidden>
+        <h1>Happy birthday Oyinkansol<span class="tail">aaaaaaa</span></h1>
+        <p class="lead">May the wish land.</p>
+        <p class="card" style="text-align:left">PS: I still owe you a birthday gift. This page is the deposit. I haven't forgotten, and I know you won't let me forget.</p>
+        <button class="btn ghost" id="again"><i data-lucide="party-popper"></i>More confetti</button>
+      </div>
+    </section>
+  </div>
+
+  <nav class="bar" id="bar">
+    <button class="btn ghost round" id="back" aria-label="Back"><i data-lucide="chevron-left"></i></button>
+    <button class="btn next" id="next">Next<i data-lucide="arrow-right"></i></button>
+  </nav>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
+<script>
+(function () {
+  const icons = () => { try { lucide.createIcons(); } catch (e) {} };
+  const $ = (id) => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* name tail with hopping a's */
+  const tail = $('tail');
+  for (let i = 0; i < 7; i++) {
+    const b = document.createElement('b');
+    b.textContent = 'a';
+    b.style.animationDelay = (i * 0.09) + 's';
+    tail.appendChild(b);
+  }
+
+  /* navigation */
+  const screens = [...document.querySelectorAll('.screen')];
+  const progress = $('progress');
+  screens.forEach(() => { const s = document.createElement('span'); s.appendChild(document.createElement('i')); progress.appendChild(s); });
+  let cur = 0, giftOpened = false;
+
+  function render() {
+    screens.forEach((s, i) => {
+      s.classList.toggle('active', i === cur);
+      s.classList.toggle('left', i < cur);
+      s.setAttribute('aria-hidden', i === cur ? 'false' : 'true');
+      s.inert = i !== cur;
+    });
+    [...progress.children].forEach((s, i) => s.classList.toggle('done', i <= cur));
+    $('back').disabled = cur === 0;
+    $('next').disabled = (cur === 0 && !giftOpened) || cur === screens.length - 1;
+    $('bar').style.visibility = cur === 0 && !giftOpened ? 'hidden' : 'visible';
+    screens[cur].scrollTop = 0;
+  }
+  function go(d) { cur = Math.max(0, Math.min(screens.length - 1, cur + d)); render(); }
+  $('next').addEventListener('click', () => go(1));
+  $('back').addEventListener('click', () => go(-1));
+
+  /* confetti */
+  const cv = $('confetti'), cx = cv.getContext('2d');
+  let parts = [], raf = 0;
+  const colors = ['#FFC83D', '#FFFCEF', '#D8432B', '#E8A317', '#2E1F0B'];
+  function sizeCv() { const r = devicePixelRatio || 1; cv.width = innerWidth * r; cv.height = innerHeight * r; cx.setTransform(r, 0, 0, r, 0, 0); }
+  addEventListener('resize', sizeCv); sizeCv();
+  function confetti(n = 140) {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      parts.push({ x: innerWidth / 2 + (Math.random() - .5) * 80, y: innerHeight * .45, vx: (Math.random() - .5) * 14, vy: -Math.random() * 15 - 5,
+        w: 6 + Math.random() * 6, h: 8 + Math.random() * 8, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: colors[i % colors.length], life: 0 });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+  function tick() {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => { p.vy += .38; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.life * .1))); cx.restore(); });
+    parts = parts.filter(p => p.y < innerHeight + 40);
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+    if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  /* toast */
+  let tt;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 1800); }
+
+  /* 0 gift */
+  $('giftbox').addEventListener('click', () => {
+    if (giftOpened) { go(1); return; }
+    giftOpened = true;
+    $('giftbox').classList.add('open');
+    $('giftHint').textContent = 'Opened. Go on, tap next.';
+    confetti(180);
+    render();
+    setTimeout(() => { if (cur === 0) go(1); }, 1400);
+  });
+
+  /* 2 argue: the "Me" button refuses to be picked */
+  const me = $('pickMe');
+  const dodges = ['Nope', 'Not today', 'Try again', 'Be serious', 'Birthday rules'];
+  let dodge = 0;
+  function runAway(e) {
+    if (dodge >= dodges.length) return;
+    e.preventDefault();
+    const arena = $('arena').getBoundingClientRect();
+    const maxX = Math.max(0, arena.width - me.offsetWidth);
+    const x = Math.random() * maxX, y = 10 + Math.random() * 110;
+    me.style.transform = `translate(${x}px, ${y}px)`;
+    me.lastChild.textContent = dodges[dodge++];
+    if (dodge >= dodges.length) { me.disabled = true; me.lastChild.textContent = 'Fine, it is you'; }
+  }
+  me.addEventListener('pointerdown', runAway);
+  me.addEventListener('click', (e) => { e.preventDefault(); });
+  $('pickHer').addEventListener('click', () => {
+    $('choices').hidden = true; $('verdict').hidden = false;
+    if (dodge > 0) $('verdictText').textContent = `I saw you try to press "Me" ${dodge === 1 ? 'once' : dodge + ' times'}. Still, it's your birthday, so you win every argument today. Tomorrow I'm back to proving you wrong.`;
+    confetti(60);
+  });
+
+  /* 3 spaghetti on canvas */
+  const pc = $('plate'), pg = pc.getContext('2d');
+  const S = 280, dpr = devicePixelRatio || 1;
+  pc.width = S * dpr; pc.height = S * dpr; pg.scale(dpr, dpr);
+  let strands = [], bites = 0;
+  const TOTAL = 6;
+  function makeStrands() {
+    strands = [];
+    for (let i = 0; i < 48; i++) {
+      const pts = []; let a = Math.random() * Math.PI * 2, r = Math.random() * 70;
+      for (let k = 0; k < 6; k++) { a += (Math.random() - .5) * 1.8; r = Math.min(82, Math.max(6, r + (Math.random() - .5) * 40)); pts.push([S / 2 + Math.cos(a) * r, S / 2 + Math.sin(a) * r]); }
+      strands.push(pts);
+    }
+  }
+  function drawPlate() {
+    pg.clearRect(0, 0, S, S);
+    pg.fillStyle = '#FFFCEF'; pg.strokeStyle = '#2E1F0B'; pg.lineWidth = 3;
+    pg.beginPath(); pg.arc(S / 2, S / 2, 130, 0, Math.PI * 2); pg.fill(); pg.stroke();
+    pg.beginPath(); pg.arc(S / 2, S / 2, 100, 0, Math.PI * 2); pg.strokeStyle = 'rgba(46,31,11,.18)'; pg.lineWidth = 2; pg.stroke();
+    pg.lineCap = 'round'; pg.lineJoin = 'round';
+    strands.forEach(pts => {
+      [[6, '#C98A12'], [3.6, '#F6D372']].forEach(([w, c]) => {
+        pg.lineWidth = w; pg.strokeStyle = c; pg.beginPath(); pg.moveTo(pts[0][0], pts[0][1]);
+        for (let k = 1; k < pts.length - 1; k++) { const mx = (pts[k][0] + pts[k + 1][0]) / 2, my = (pts[k][1] + pts[k + 1][1]) / 2; pg.quadraticCurveTo(pts[k][0], pts[k][1], mx, my); }
+        pg.stroke();
+      });
+    });
+    const left = TOTAL - bites;
+    if (left > 1) {
+      const s = left / TOTAL;
+      pg.fillStyle = '#D8432B'; pg.strokeStyle = '#2E1F0B'; pg.lineWidth = 2.5;
+      pg.beginPath(); pg.ellipse(S / 2, S / 2, 38 * s + 8, 30 * s + 6, .3, 0, Math.PI * 2); pg.fill(); pg.stroke();
+      const balls = [[-14, -6], [14, 4], [-2, 16]].slice(0, Math.max(0, left - 2));
+      balls.forEach(([x, y]) => { pg.fillStyle = '#6B3A1E'; pg.beginPath(); pg.arc(S / 2 + x, S / 2 + y, 11, 0, Math.PI * 2); pg.fill(); pg.stroke(); });
+    }
+    if (left === 0) {
+      pg.fillStyle = 'rgba(216,67,43,.25)';
+      pg.beginPath(); pg.ellipse(S / 2 + 10, S / 2 - 6, 30, 12, .5, 0, Math.PI * 2); pg.fill();
+    }
+  }
+  function twirl() {
+    if (bites >= TOTAL) { toast('Plate is already clean'); return; }
+    bites++;
+    strands.splice(0, Math.ceil(strands.length / (TOTAL - bites + 1)));
+    const f = $('fork'); f.classList.remove('spin'); void f.offsetWidth; f.classList.add('spin');
+    drawPlate();
+    $('bites').textContent = `${bites} of ${TOTAL} forkfuls`;
+    if (bites === TOTAL) { $('cleanPlate').hidden = false; confetti(70); }
+  }
+  makeStrands(); drawPlate();
+  pc.addEventListener('click', twirl);
+  $('twirlBtn').addEventListener('click', twirl);
+
+  /* 4 craving: wrong answers reshuffle the list until she picks the real one */
+  const scolds = ['Lies.', 'Be serious.', 'Oyinkansolaaaaaaa, tell the truth.', 'I know you. Try again.', 'Not even close.', 'You are just pressing anything now.', 'The answer is right there.'];
+  let wrong = 0, guessed = false;
+  const chipsBox = $('chips');
+  function shuffleChips() {
+    const kids = [...chipsBox.children];
+    let order;
+    do { order = kids.slice().sort(() => Math.random() - .5); } while (order.every((k, i) => k === kids[i]));
+    order.forEach(k => chipsBox.appendChild(k));
+  }
+  chipsBox.addEventListener('click', (e) => {
+    const c = e.target.closest('.chip'); if (!c || guessed) return;
+    if (c.dataset.right) {
+      guessed = true;
+      c.classList.add('yes');
+      [...chipsBox.children].forEach(k => { if (k !== c) k.hidden = true; });
+      $('scold').textContent = '';
+      $('knewTries').textContent = wrong === 0
+        ? 'First try. You know yourself.'
+        : `It only took you ${wrong} wrong ${wrong === 1 ? 'answer' : 'answers'} to admit it.`;
+      $('knew').hidden = false;
+      confetti(90);
+      return;
+    }
+    $('scold').textContent = scolds[wrong % scolds.length];
+    wrong++;
+    c.classList.add('nope');
+    setTimeout(() => { c.classList.remove('nope'); shuffleChips(); }, 380);
+  });
+
+  /* 6 prayers */
+  const prayers = [
+    ['sparkles', 'May this new age bring you joy you did not have to beg for.'],
+    ['door-open', 'May God open doors for you that nobody can shut.'],
+    ['heart-pulse', 'May your health stay strong and your mind stay at peace.'],
+    ['users', 'May the few people you let in always be the right ones.'],
+    ['wallet', 'May your money be like your name. Honey has touched wealth, so let the wealth show up.'],
+    ['utensils', 'May every craving find you, and may someone else always pay for it.'],
+    ['sun', 'May everything you are quietly praying for show up loudly this year.']
+  ];
+  let amens = 0;
+  const pw = $('prayers');
+  prayers.forEach(([ic, text]) => {
+    const d = document.createElement('div'); d.className = 'prayer';
+    d.innerHTML = `<span class="ic"><i data-lucide="${ic}"></i></span><p></p><button class="amen"><i data-lucide="hand-heart"></i>Amen</button>`;
+    d.querySelector('p').textContent = text;
+    const b = d.querySelector('.amen');
+    b.addEventListener('click', () => {
+      if (b.classList.contains('said')) return;
+      b.classList.add('said'); b.lastChild.textContent = 'Amen, received';
+      amens++; $('amenCount').textContent = `${amens} of ${prayers.length}`;
+      if (amens === prayers.length) { confetti(90); toast('All received'); }
+    });
+    pw.appendChild(d);
+  });
+
+  /* 8 cake */
+  let blown = false;
+  $('cake').addEventListener('click', () => {
+    if (blown) { confetti(120); return; }
+    blown = true;
+    $('cake').classList.add('blown');
+    $('cakeTitle').textContent = 'Wish sent';
+    $('cakeHint').hidden = true;
+    $('final').hidden = false;
+    setTimeout(() => confetti(220), 250);
+  });
+  $('again').addEventListener('click', () => confetti(160));
+
+  icons();
+  render();
+})();
+</script>
